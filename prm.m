@@ -11,33 +11,26 @@ ys = (world_bounds_thdot(2) - world_bounds_thdot(1))*rand(1) + world_bounds_thdo
 % Start and goal positions
 figure(1); clf;
 xy_start = [xs;ys]; plot(xy_start(1),xy_start(2),'bo','MarkerFaceColor','b','MarkerSize',10);
-xy_goal = [pi;0]; plot(xy_goal(1),xy_goal(2),'go','MarkerFaceColor','g','MarkerSize',10); drawnow;
-
 
 % Initialize PRM. The PRM will be represented as a 2 x N list of points, and the connections
 % between vertices will be represented as a N x N matrix of edges. Finally, the distances 
 % between vertices will be represented as a N x N matrix of distances. 
-
-prm_verts = zeros(2,100);
+no_nodes = 10;
+prm_verts = zeros(2,no_nodes);
+prm_graph = zeros(no_nodes);
 prm_verts(:,1) = xy_start;
 
 N = 1;
-nearGoal = false; % This will be set to true if goal has been reached
-minDistGoal = 0.25; 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % The number of closest vertices considered for each new point
 k_verts = 5
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-method = 'lqr'; % LQR distance metric 
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 figure(1); hold on;
 axis([world_bounds_th, world_bounds_thdot]);
 hxy = plot(0,0,'ro');
 % PRM algorithm
-while N < 10;
+while N < no_nodes;
     % Sample point
     rnd = rand(1);
     % With probability 0.05, sample a random point from another tree. 
@@ -52,21 +45,39 @@ while N < 10;
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Extend closest vertex in direction of random point
-    if strcmp(method, 'lqr')
-        [closest_vert,K,ix] = closestVerticesLQR(prm_verts(:,1:N),xy);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        new_vert = extendLQR(closest_vert,xy,K); 
+    [closest_vert,K,ix] = closestVertexLQR(prm_verts(:,1:N),xy);
+    % This will be the new vertex added to the graph
+    new_vert = extendLQR(closest_vert,xy,K); 
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % If it is collision free, add it to tree    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    N = N+1;
+    if N > size(prm_verts,2)
+        prm_verts = [prm_verts zeros(size(prm_verts))];
     end
+    prm_verts(:,N) = new_vert;
+    
+    disp(N);
+
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Extend closest k - 1 vertices to the newly formed vertex if they can get there
-    if strcmp(method, 'lqr')
-        [closest_vertices,K,ix] = closestVerticesLQR(prm_verts(:,1:N),new_vert,k_verts);
-        % Need to reprogram this function
-        new_vert = extendLQR(closest_vert,xy,K); 
-        % Need to also include all connections from new node to all other nodes
-    end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+    [closest_vertices,K,ix] = closestVerticesLQR(prm_verts(:,1:N),new_vert,k_verts-1);
+    % Now we need to dircol to the new vert TODO 
+    new_verts = addEdgesLQR(closest_vertices,new_vert,K); 
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Now we check if those vertices are near the closest vertices and form links if yes
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    for k = 1:k_verts 
+        if norm(new_verts(1:2,k)-new_vert) < 0.25
+            prm_graph = addConnection(prm_graph,prm_verts,new_verts(:,k),new_vert)
+        end 
+    end 
 
     delete(hxy);
     figure(1);
@@ -87,23 +98,7 @@ while N < 10;
         line([closest_vert(1),new_vert(1)],[closest_vert(2),new_vert(2)]);
     end
     axis([world_bounds_th, world_bounds_thdot]);
-
-    
-    %% DO NOT MODIFY THIS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % If it is collision free, add it to tree    
-    N = N+1;
-    if N > size(rrt_verts,2)
-        rrt_verts = [rrt_verts zeros(size(rrt_verts))];
-    end
-    rrt_verts(:,N) = [new_vert;ix];
-    
-    % Check if we have reached goal
-    if norm(xy_goal-new_vert) < minDistGoal
-        break;
-    end
-    disp(N);
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
        
 end
