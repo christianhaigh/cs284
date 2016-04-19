@@ -34,7 +34,7 @@ Q = eye(2);
 S_verts = []
 K_verts = []
 for k = 1:length(prm_verts)
-    A = [0,1;-g*cos(xy(1)),-b];
+    A = [0,1;-g*cos(prm_verts(1,k)),-b];
     B = [0;1];
     [K,S] = lqr(A,B,Q,R);
     S_verts = [S_verts, S];
@@ -43,30 +43,23 @@ end
 
 % K Closest neighbors 
 k = 5
-[closest_vertices] = closestVerticesLQR(prm_verts, S_verts, K_verts, k)
-
-
-
-
-nearGoal = false; % This will be set to true if goal has been reached
-minDistGoal = 0.25; % This is the convergence criterion. We will declare
-                    % success when the tree reaches within 0.25 in distance
-                    % from the goal. DO NOT MODIFY.
-
-
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% FILL ME IN %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Choose one of these methods
-%method = 'euclidean'; % Euclidean distance metric (part b of problem)
-method = 'lqr'; % LQR distance metric (part d of problem)
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[closest_vertices] = closestVerticesLQR(prm_verts, S_verts, K_verts, k);
 
 
 figure(1); hold on;
 axis([world_bounds_th, world_bounds_thdot]);
-% RRT algorithm
-while ~nearGoal
+
+for k = 1:length(prm_verts)
+    ix = closest_vertices(1,k);
+    K = [K_verts(:,ix*2-1),K_verts(:,ix*2)];
+    new_vert = extendLQR(prm_verts(:,ix),prm_verts(:,k),K); 
+    disp(prm_verts(:,ix));
+    disp(new_vert);
+end
+
+
+
+%{
     % Sample point
     rnd = rand(1);
     % With probability 0.05, sample the goal. This promotes movement to the
@@ -92,7 +85,7 @@ while ~nearGoal
     if strcmp(method, 'euclidean')
         new_vert = extendEuclidean(closest_vert,xy); % Write this function
     else
-        new_vert = extendLQR(closest_vert,xy,K); % Write this function
+        
     end
 
     delete(hxy);
@@ -166,3 +159,4 @@ end
 %traj = PPTrajectory(foh(ts,xys));
 %traj = traj.setOutputFrame(pv.getInputFrame());
 %playback(pv,traj);
+%}

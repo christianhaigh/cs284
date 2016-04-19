@@ -48,13 +48,13 @@ function new_vert = extendLQR(closest_vert,xy, K)
         xdot = fdynamics(t,x,g,b,u);
     end 
 
-    time = [0,0.1];
+    time = [0,0.2];
     [ts,xs] = ode45(@ode_dynamics,time,closest_vert);
     new_vert = xs(length(xs),:)';
     while(new_vert(1) > 3*pi/2)
-        new_vert(1) = new_vert(1) - 2*pi 
+        new_vert(1) = new_vert(1) - 2*pi; 
     end
     while(new_vert(1) < -pi/2)
-        new_vert(1) = new_vert(1) + 2*pi
+        new_vert(1) = new_vert(1) + 2*pi;
     end 
 end 

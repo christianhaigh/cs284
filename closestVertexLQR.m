@@ -34,6 +34,7 @@ function [closest_vert, K, ix] = closestVertexLQR(tree_verts,xy)
 			dist = (new_vert_b-xy)'*S*(new_vert_b-xy);
 			new_vert = new_vert_b;
 		end 
+		disp(dist);
 		if dist < distance  
 			distance = dist;
 			closest_vert = new_vert;
@@ -41,9 +42,9 @@ function [closest_vert, K, ix] = closestVertexLQR(tree_verts,xy)
 		end 
 	end 
 	while(closest_vert(1) > 3*pi/2)
-		closest_vert(1) = closest_vert(1) - 2*pi
+		closest_vert(1) = closest_vert(1) - 2*pi;
 	end
 	while(closest_vert(1) < -pi/2)
-		closest_vert(1) = closest_vert(1) + 2*pi
+		closest_vert(1) = closest_vert(1) + 2*pi;
 	end
 end 
