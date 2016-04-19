@@ -1,6 +1,4 @@
 function [closest_vert, K, ix] = closestVertexLQR(tree_verts,xy)
-	g = 9.81; 
-	b = 0.1;
 	distance = inf;
 	closest_vert = tree_verts(1:2,1);
 	lower_bound = -pi/2;
@@ -11,6 +9,8 @@ function [closest_vert, K, ix] = closestVertexLQR(tree_verts,xy)
 	while xy(1) < -pi/2 
 		xy(1) = xy(1) + 2*pi;
 	end 
+	g = 9.81; 
+	b = 0.1;
 	R = 0.1; 
 	Q = eye(2);
 	A = [0,1;-g*cos(xy(1)),-b];

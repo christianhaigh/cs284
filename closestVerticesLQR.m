@@ -1,4 +1,4 @@
-function [closest_vertices, K, ix] = closestVerticesLQR(tree_verts,xy,k_verts)
+function [closest_vertices] = closestVerticesLQR(prm_verts, S_verts, K_verts, k)
 	g = 9.81; 
 	b = 0.1;
 	distances = repmat(inf,1,k_verts);
