@@ -16,7 +16,7 @@ xy_start = [xs_start;ys_start]; plot(xy_start(1),xy_start(2),'ro','MarkerFaceCol
 xy_goal = [xs_goal;ys_goal]; plot(xy_goal(1),xy_goal(2),'go','MarkerFaceColor','g','MarkerSize',10); drawnow;
 
 % Initialize n random vertices in state space
-n = 100;
+n = 500;
 xs = (world_bounds_th(2) - world_bounds_th(1))*rand(1,n) + world_bounds_th(1);
 ys = (world_bounds_thdot(2) - world_bounds_thdot(1))*rand(1,n) + world_bounds_thdot(1);
 prm_verts = [xs;ys];
@@ -51,10 +51,13 @@ axis([world_bounds_th, world_bounds_thdot]);
 
 for k = 1:length(prm_verts)
     ix = closest_vertices(1,k);
-    K = [K_verts(:,ix*2-1),K_verts(:,ix*2)];
-    new_vert = extendLQR(prm_verts(:,ix),prm_verts(:,k),K); 
-    disp(prm_verts(:,ix));
-    disp(new_vert);
+    xy = prm_verts(:,ix);
+    closest_vert = prm_verts(:,k);
+    K = K_verts(ix*2-1:ix*2);
+    new_vert = extendLQR(prm_verts(:,k),prm_verts(:,ix),K); 
+    if norm(new_vert - xy) < 0.25
+        plot(new_vert(1), new_vert(2),'ro','MarkerFaceColor','y','MarkerSize',10);
+    end
 end
 
 

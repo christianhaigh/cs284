@@ -2,6 +2,7 @@ function new_vert = extendLQR(closest_vert,xy, K)
 	u0 = 0;
 	g = 9.81;
 	b = 0.1;
+
     lower_bound = -pi/2;
     upper_bound = 3*pi/2;
     while xy(1) > 3*pi/2
@@ -48,7 +49,7 @@ function new_vert = extendLQR(closest_vert,xy, K)
         xdot = fdynamics(t,x,g,b,u);
     end 
 
-    time = [0,0.2];
+    time = [0,0.01];
     [ts,xs] = ode45(@ode_dynamics,time,closest_vert);
     new_vert = xs(length(xs),:)';
     while(new_vert(1) > 3*pi/2)

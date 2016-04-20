@@ -9,8 +9,8 @@ function [closest_vertices] = closestVerticesLQR(prm_verts, S_verts, K_verts, K)
 		for j = 1:length(prm_verts)
 			if j ~= k
 				vert_2 = prm_verts(:,j);
-				S = S_verts(:,j);
-				K = K_verts(:,j);
+				S = [S_verts(:,j*2-1),S_verts(:,j*2)];
+				K = [K_verts(:,j*2-1),K_verts(:,j*2)];
 				if vert_1(1) > vert_2(1)
 					wrap = 2*pi;
 				else 
@@ -24,7 +24,7 @@ function [closest_vertices] = closestVerticesLQR(prm_verts, S_verts, K_verts, K)
 					dist = (vert_1_b-vert_2)'*S*(vert_1_b-vert_2);
 				end 
 				[argvalue, argmax] = max(distances(:,k));
-				if norm(dist) < argvalue 
+				if dist < argvalue 
 					distances(argmax,k) = norm(dist);
 					closest_vertices(argmax,k) = j;
 				end 
