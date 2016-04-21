@@ -1,4 +1,5 @@
 %% Code setup (Do not modify, but please read) %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+pd = PendulumPlant;
 
 % Bounds on world
 world_bounds_th = [-pi/2,(3/2)*pi];
@@ -16,7 +17,7 @@ xy_start = [xs_start;ys_start]; plot(xy_start(1),xy_start(2),'ro','MarkerFaceCol
 xy_goal = [xs_goal;ys_goal]; plot(xy_goal(1),xy_goal(2),'go','MarkerFaceColor','g','MarkerSize',10); drawnow;
 
 % Initialize n random vertices in state space
-n = 500;
+n = 1000;
 xs = (world_bounds_th(2) - world_bounds_th(1))*rand(1,n) + world_bounds_th(1);
 ys = (world_bounds_thdot(2) - world_bounds_thdot(1))*rand(1,n) + world_bounds_thdot(1);
 prm_verts = [xs;ys];
@@ -42,27 +43,33 @@ for k = 1:length(prm_verts)
 end 
 
 % K Closest neighbors 
-k = 5
-[closest_vertices] = closestVerticesLQR(prm_verts, S_verts, K_verts, k);
+K_closest = 5
+[closest_vertices] = closestVerticesLQR(prm_verts, S_verts, K_verts, K_closest);
 
 
 figure(1); hold on;
 axis([world_bounds_th, world_bounds_thdot]);
 
+no = 0
 for k = 1:length(prm_verts)
-    ix = closest_vertices(1,k);
-    xy = prm_verts(:,ix);
-    closest_vert = prm_verts(:,k);
-    K = K_verts(ix*2-1:ix*2);
-    new_vert = extendLQR(prm_verts(:,k),prm_verts(:,ix),K); 
-    if norm(new_vert - xy) < 0.25
-        plot(new_vert(1), new_vert(2),'ro','MarkerFaceColor','y','MarkerSize',10);
+    for j = 1:K_closest
+        ix = closest_vertices(j,k);
+        xy = prm_verts(:,ix);
+        closest_vert = prm_verts(:,k);
+        %[utraj, xtraj] = dircol(pd,closest_vert,xy);
+        K = K_verts(ix*2-1:ix*2);
+        new_vert = extendLQR(prm_verts(:,k),prm_verts(:,ix),K); 
+        if norm(new_vert - xy) < 0.2
+            no = no + 1;
+            plot(new_vert(1), new_vert(2),'ro','MarkerFaceColor','y','MarkerSize',10);
+        end
     end
 end
-
-
+    %disp(xtraj);
+%end
 
 %{
+
     % Sample point
     rnd = rand(1);
     % With probability 0.05, sample the goal. This promotes movement to the
