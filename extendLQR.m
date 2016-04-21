@@ -28,20 +28,20 @@ function new_vert = extendLQR(closest_vert,xy, K)
     end
     u = -K*(distance) + u0;
 
-    if u > 5 
-        u = 5;
-    elseif u < -5
-        u = -5;
+    if u > 10 
+        u = 10;
+    elseif u < -10
+        u = -10;
     end 
     
     function xdot = fdynamics(t,x,g,b,u)
         dtheta = x(2);
         distance = x - xy;
         u = -K*(distance) + u0;
-        if u > 5 
-            u = 5;
-        elseif u <-5 
-            u = -5; 
+        if u > 10 
+            u = 10;
+        elseif u <-10 
+            u = -10; 
         end 
         ddtheta = (u - g*sin(x(1)) - b*x(2));
         xdot = [dtheta; ddtheta];
@@ -61,7 +61,6 @@ function new_vert = extendLQR(closest_vert,xy, K)
             dist = lqr_dist;
         end 
     end 
-    disp(dist);
     while(new_vert(1) > 3*pi/2)
         new_vert(1) = new_vert(1) - 2*pi; 
     end

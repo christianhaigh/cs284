@@ -13,8 +13,8 @@ xs_goal = (world_bounds_th(2) - world_bounds_th(1))*rand(1) + world_bounds_th(1)
 ys_goal = (world_bounds_thdot(2) - world_bounds_thdot(1))*rand(1) + world_bounds_thdot(1);
 
 % plot start and goal positions
-xy_start = [xs_start;ys_start]; plot(xy_start(1),xy_start(2),'ro','MarkerFaceColor','r','MarkerSize',10); hold on;
-xy_goal = [xs_goal;ys_goal]; plot(xy_goal(1),xy_goal(2),'go','MarkerFaceColor','g','MarkerSize',10); drawnow;
+xy_start = [xs_start;ys_start]; plot(xy_start(1),xy_start(2),'ro','MarkerFaceColor','r','MarkerSize',1); hold on;
+xy_goal = [xs_goal;ys_goal]; plot(xy_goal(1),xy_goal(2),'go','MarkerFaceColor','g','MarkerSize',1); drawnow;
 
 % Initialize n random vertices in state space
 n = 1000;
@@ -22,7 +22,7 @@ xs = (world_bounds_th(2) - world_bounds_th(1))*rand(1,n) + world_bounds_th(1);
 ys = (world_bounds_thdot(2) - world_bounds_thdot(1))*rand(1,n) + world_bounds_thdot(1);
 prm_verts = [xs;ys];
 hold on;
-plot(prm_verts(1,:),prm_verts(2,:),'bo','MarkerFaceColor','b','MarkerSize',5);
+plot(prm_verts(1,:),prm_verts(2,:),'bo','MarkerFaceColor','b','MarkerSize',1);
 drawnow;
 N = 1;
 
@@ -32,8 +32,8 @@ g = 9.81;
 b = 0.1;
 R = 0.1; 
 Q = eye(2);
-S_verts = []
-K_verts = []
+S_verts = [];
+K_verts = [];
 for k = 1:length(prm_verts)
     A = [0,1;-g*cos(prm_verts(1,k)),-b];
     B = [0;1];
@@ -43,14 +43,14 @@ for k = 1:length(prm_verts)
 end 
 
 % K Closest neighbors 
-K_closest = 5
+K_closest = 5;
 [closest_vertices] = closestVerticesLQR(prm_verts, S_verts, K_verts, K_closest);
 
 
 figure(1); hold on;
 axis([world_bounds_th, world_bounds_thdot]);
 
-no = 0
+no = 0;
 for k = 1:length(prm_verts)
     for j = 1:K_closest
         ix = closest_vertices(j,k);
@@ -59,9 +59,9 @@ for k = 1:length(prm_verts)
         %[utraj, xtraj] = dircol(pd,closest_vert,xy);
         K = K_verts(ix*2-1:ix*2);
         new_vert = extendLQR(prm_verts(:,k),prm_verts(:,ix),K); 
-        if norm(new_vert - xy) < 0.2
+        if norm(new_vert - xy) < 0.25
             no = no + 1;
-            plot(new_vert(1), new_vert(2),'ro','MarkerFaceColor','y','MarkerSize',10);
+            plot(new_vert(1), new_vert(2),'ro','MarkerFaceColor','y','MarkerSize',1);
         end
     end
 end
