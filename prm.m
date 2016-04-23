@@ -4,12 +4,13 @@
 world_bounds_th = [-pi/2,(3/2)*pi];
 world_bounds_thdot = [-10,10];
 
-xs = (world_bounds_th(2) - world_bounds_th(1))*rand(1) + world_bounds_th(1);
-ys = (world_bounds_thdot(2) - world_bounds_thdot(1))*rand(1) + world_bounds_thdot(1);
+
 
 
 % Start and goal positions
 figure(1); clf;
+xs = (world_bounds_th(2) - world_bounds_th(1))*rand(1) + world_bounds_th(1);
+ys = (world_bounds_thdot(2) - world_bounds_thdot(1))*rand(1) + world_bounds_thdot(1);
 xy_start = [xs;ys]; plot(xy_start(1),xy_start(2),'bo','MarkerFaceColor','b','MarkerSize',10);
 
 % Initialize PRM. The PRM will be represented as a 2 x N list of points, and the connections

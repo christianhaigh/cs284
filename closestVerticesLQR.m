@@ -1,4 +1,4 @@
-function [closest_vertices] = closestVerticesLQR(prm_verts, S_verts, K_verts, K)
+function [closest_vertices, distances] = closestVerticesLQR(prm_verts, S_verts, K_verts, K)
 	closest_vertices = zeros(K,length(prm_verts));
 	distances = inf(K,length(prm_verts));
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
